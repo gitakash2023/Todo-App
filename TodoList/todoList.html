@@ -1,11 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    Todo List updated
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ToDo App</title>
+    <style>
+      .sidebar-container {
+        display: flex;
+      }
+      .left-sidebar {
+        width: 383px;
+        height: 1105px;
+        background: #dbeadd;
+      }
+      .right-sidebar {
+        height: 1024px;
+        width: 1440px;
+      }
+      .topNavigation-bar {
+        height: 101px;
+        background: #d9d9d9;
+        box-shadow: 1px 2px 0px 0px rgba(206, 206, 206, 0.53);
+      }
+      .rightListArea {
+        height: 1024px;
+        background: #dbeadd;
+        display: flex;
+        justify-content: center;
+      }
+      .leftTop-sidebar {
+        display: flex;
+        width: 303px;
+        height: 135px;
+        flex-shrink: 0;
+        border-radius: 0px 0px 24px 24px;
+        background: #dbeadd;
+        margin-top: 40px;
+        margin-left: 30px;
+      }
+      .top-iconimg {
+        width: 46px;
+        height: 51.111px;
+        flex-shrink: 0;
+      }
+      .ToDo {
+        color: #0d5329;
+        font-family: Josefin Sans;
+        font-size: 40px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        margin-left: 18px;
+      }
+      .leftdown-sidebar {
+        display: flex;
+        width: 309px;
+        height: 48.276px;
+        border-radius: 10px;
+        background: #c4dcd3;
+        margin-top: 15px;
+        padding: 10px 20px;
+        align-items: center;
+      }
+      .task-img {
+        width: 23px;
+        height: 23px;
+      }
+      .tasks-text {
+        color: #5b5b5b;
+        font-family: Josefin Sans;
+        font-size: 32px;
+        font-weight: 400;
+        margin-left: 20px;
+      }
+      .started-img {
+        width: 23px;
+        height: 23px;
+      }
+      .started-text {
+        color: #5b5b5b;
+        font-family: Josefin Sans;
+        font-size: 32px;
+        font-weight: 400;
+        margin-left: 20px;
+      }
+      .bin-img {
+        width: 23px;
+        height: 23px;
+      }
+      .bin-text {
+        color: #5b5b5b;
+        font-family: Josefin Sans;
+        font-size: 32px;
+        font-weight: 400;
+        margin-left: 20px;
+      }
+      .dynamicHeading {
+        color: red;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        height: 37px;
+        color: #26332e;
+        font-family: Josefin Sans;
+        font-size: 32px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        margin-top: 20px;
+        background: #d9d9d9;
+      }
+      #todo-input {
+        margin-right: 20px;
+        border-radius: 5px;
+        width: 400px;
+        height: 30px;
+      }
+      #add-todo {
+        background-color: antiquewhite;
+        color: sienna;
+        border-radius: 5px;
+        height: 35px;
+      }
+      form {
+        margin-top: 100px;
+      }
+      form label {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body style="background-color: #dbeadd">
+    <div class="sidebar-container">
+      <div class="left-sidebar">
+        <div class="leftTop-sidebar">
+          <div class="top-iconimg">
+            <img src="assets\Icon.svg" alt="Icon img" />
+          </div>
+          <div class="ToDo">TO-DO ‘s</div>
+        </div>
+        <div class="leftdown-sidebar">
+          <div class="task-img">
+            <img src="assets\image 1.png" alt="taksimg" />
+          </div>
+          <div class="tasks-text" id="taskTest">tasks</div>
+        </div>
+        <div class="leftdown-sidebar">
+          <div class="started-img">
+            <img src="assets\Star 2.svg" alt="started img" />
+          </div>
+          <div class="started-text" id="startedText">starred</div>
+        </div>
+        <div class="leftdown-sidebar">
+          <div class="bin-img">
+            <img src="assets\bin icon.svg" alt="bin img" />
+          </div>
+          <div class="bin-text" id="binText">bin</div>
+        </div>
+      </div>
+      <div class="right-sidebar">
+        <div class="topNavigation-bar" id="topNavigation-bar"></div>
+        <div class="rightListArea">
+          <form action="">
+            <label for="ToDo Input">ToDo Input:</label>
+            <input type="text" name="ToDo Input" id="todo-input" />
+            <button id="add-todo">add</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    const inputField = document.getElementById("todo-input");
+    const addTodo = document.getElementById("add-todo");
+    const startedText = document.getElementById("startedText");
+    const binText = document.getElementById("binText");
+    const taskText = document.getElementById("taskTest");
+
+    addTodo.addEventListener("click", () => {
+      const inputData = inputField.value;
+
+      const currentTodoList =
+        JSON.parse(localStorage.getItem("TodoList")) || [];
+      currentTodoList.push(inputData);
+
+      localStorage.setItem("TodoList", JSON.stringify(currentTodoList));
+    });
+    [
+      {
+        item: taskText,
+        remainingItem: [startedText, binText],
+        itemHeading: "task",
+      },
+      {
+        item: startedText,
+        remainingItem: [taskText, binText],
+        itemHeading: "stared ",
+      },
+      {
+        item: binText,
+        remainingItem: [startedText, taskText],
+        itemHeading: "bin",
+      },
+    ].forEach(({ item, remainingItem, itemHeading }) => {
+      item.addEventListener("click", () => {
+        const heading = document.createElement("h1");
+        heading.innerHTML = itemHeading;
+        const topNavigationbar = document.getElementById("topNavigation-bar");
+        topNavigationbar.innerHTML = "";
+        topNavigationbar.appendChild(heading);
+        topNavigationbar.classList.add("dynamicHeading");
+        taskText.style.color = "blue";
+        heading.style.color = "blue";
+        remainingItem.forEach((remaining) => {
+          remaining.style.color = "#5b5b5b";
+        });
+      });
+    });
+
+    // taskText.addEventListener("click", () => {
+    //   const heading = document.createElement("h1");
+    //   heading.innerHTML = " tasks";
+    //   const topNavigationbar = document.getElementById("topNavigation-bar");
+    //   topNavigationbar.innerHTML = "";
+    //   topNavigationbar.appendChild(heading);
+    //   topNavigationbar.classList.add("dynamicHeading");
+    //   taskText.style.color = "blue";
+    //   heading.style.color = "blue";
+    //   startedText.style.color = "#5b5b5b";
+    //   binText.style.color = "#5b5b5b";
+    // });
+
+    // startedText.addEventListener("click", () => {
+    //   const heading = document.createElement("h1");
+    //   heading.innerHTML = "Saved Tasks";
+    //   const topNavigationbar = document.getElementById("topNavigation-bar");
+    //   topNavigationbar.innerHTML = "";
+    //   topNavigationbar.appendChild(heading);
+    //   topNavigationbar.classList.add("dynamicHeading");
+    //   startedText.style.color = "blue";
+    //   heading.style.color = "blue";
+    //   taskText.style.color = "#5b5b5b";
+    //   binText.style.color = "#5b5b5b";
+    // });
+
+    // binText.addEventListener("click", () => {
+    //   const heading = document.createElement("h1");
+    //   heading.innerHTML = "Bin";
+    //   const topNavigationbar = document.getElementById("topNavigation-bar");
+    //   topNavigationbar.innerHTML = "";
+    //   topNavigationbar.appendChild(heading);
+    //   topNavigationbar.classList.add("dynamicHeading");
+    //   binText.style.color = "blue";
+    //   heading.style.color = "blue";
+    //   taskText.style.color = "#5b5b5b";
+    //   startedText.style.color = "#5b5b5b";
+    // });
+  </script>
 </html>
