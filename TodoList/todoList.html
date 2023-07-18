@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ToDo App</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
       .sidebar-container {
         display: flex;
       }
@@ -62,6 +66,18 @@
         padding: 10px 20px;
         align-items: center;
       }
+      .btn-addtodo {
+        color: white;
+        padding: 6px;
+        margin: 10px;
+        background-color: black;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .btn-addtodo:hover {
+        background-color: tan;
+        color: black;
+      }
       .task-img {
         width: 23px;
         height: 23px;
@@ -72,6 +88,7 @@
         font-size: 32px;
         font-weight: 400;
         margin-left: 20px;
+        cursor: pointer;
       }
       .started-img {
         width: 23px;
@@ -83,6 +100,7 @@
         font-size: 32px;
         font-weight: 400;
         margin-left: 20px;
+        cursor: pointer;
       }
       .bin-img {
         width: 23px;
@@ -94,6 +112,7 @@
         font-size: 32px;
         font-weight: 400;
         margin-left: 20px;
+        cursor: pointer;
       }
       .dynamicHeading {
         color: red;
@@ -111,23 +130,85 @@
         margin-top: 20px;
         background: #d9d9d9;
       }
-      #todo-input {
-        margin-right: 20px;
-        border-radius: 5px;
-        width: 400px;
+      form {
+        position: absolute;
+        width: 500px;
+        background-color: white;
+        padding: 20px 10px;
+        height: 150px;
+        top: 30%;
+        box-shadow: 0px 0px 3px 10px white;
+        opacity: 0;
+        margin-top: -400px;
+        transition: 0.5s;
+      }
+      .showloginform {
+        opacity: 1;
+        margin-top: 50px;
+        display: block;
+      }
+      /* .hideloginform {
+        opacity: 0;
+        margin-top: -400px;
+      } */
+      form span {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 30px;
         height: 30px;
+        background-color: black;
+        color: red;
+        cursor: pointer;
+        line-height: 30px;
+        text-align: center;
+        border-radius: 5px;
+      }
+      form label {
+        margin-left: 5px;
+      }
+      #todo-input {
+        width: 310px;
+        height: 30px;
+        margin-top: 50px;
+        border-radius: 7px;
       }
       #add-todo {
         background-color: antiquewhite;
-        color: sienna;
+        color: salmon;
         border-radius: 5px;
         height: 35px;
+        padding: 10px 15px;
+        cursor: pointer;
+        margin-left: 10px;
       }
-      form {
-        margin-top: 100px;
+      #add-todo:hover {
+        background-color: burlywood;
+        color: orange;
       }
-      form label {
-        margin-right: 10px;
+      .list-container {
+        height: 300px;
+        width: 70%;
+        margin-top: 70px;
+        background-color: #dbeadd;
+        overflow: auto;
+      }
+      .listItem {
+        color: black;
+        padding: 2px;
+        font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+          sans-serif;
+        font-weight: 100;
+      }
+      .starrednewImg {
+        height: 20px;
+        width: 20px;
+        background-color: #dbeadd;
+        cursor: pointer;
+      }
+      .todoListIcons {
+        margin-inline: 10px;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -138,8 +219,9 @@
           <div class="top-iconimg">
             <img src="assets\Icon.svg" alt="Icon img" />
           </div>
-          <div class="ToDo">TO-DO ‘s</div>
+          <div class="ToDo" id="todo">TO-DO ‘s</div>
         </div>
+        <div><button class="btn-addtodo">click here to add todo</button></div>
         <div class="leftdown-sidebar">
           <div class="task-img">
             <img src="assets\image 1.png" alt="taksimg" />
@@ -161,101 +243,195 @@
       </div>
       <div class="right-sidebar">
         <div class="topNavigation-bar" id="topNavigation-bar"></div>
-        <div class="rightListArea">
+        <div class="rightListArea" id="rightListArea">
           <form action="">
+            <span class="span">&times;</span>
             <label for="ToDo Input">ToDo Input:</label>
             <input type="text" name="ToDo Input" id="todo-input" />
             <button id="add-todo">add</button>
           </form>
+          <div class="list-container"></div>
         </div>
       </div>
     </div>
   </body>
   <script>
+    //
+    const setTodoItems = (updatedTodoList) => {
+      localStorage.setItem("TodoList", JSON.stringify(updatedTodoList));
+    };
+    const getTodoItems = () => {
+      return JSON.parse(localStorage.getItem("TodoList")) || [];
+    };
+    //  getting elements
+    const form = document.querySelector("form");
+    const span = document.querySelector(".span");
+    const btnAddtodo = document.querySelector(".btn-addtodo");
     const inputField = document.getElementById("todo-input");
     const addTodo = document.getElementById("add-todo");
     const startedText = document.getElementById("startedText");
     const binText = document.getElementById("binText");
     const taskText = document.getElementById("taskTest");
+    const rightListArea = document.getElementById("rightListArea");
+    const topNavigationbar = document.getElementById("topNavigation-bar");
+    const listContainer = document.querySelector(".list-container");
+
+    // add events
+    btnAddtodo.addEventListener("click", () => {
+      form.classList.add("showloginform");
+      topNavigationbar.innerHTML = "";
+    });
+    span.addEventListener("click", () => {
+      form.classList.remove("showloginform");
+    });
 
     addTodo.addEventListener("click", () => {
       const inputData = inputField.value;
+      if (!inputData) {
+        alert("please enter todo");
+        return;
+      }
 
-      const currentTodoList =
-        JSON.parse(localStorage.getItem("TodoList")) || [];
-      currentTodoList.push(inputData);
+      const currentTodoList = getTodoItems();
 
-      localStorage.setItem("TodoList", JSON.stringify(currentTodoList));
+      currentTodoList.push({
+        id: Date.now(),
+        todoTitle: inputData,
+        isStarred: false,
+        isDeleted: false,
+        isPending: true,
+      });
+      setTodoItems(currentTodoList);
     });
-    [
-      {
-        item: taskText,
-        remainingItem: [startedText, binText],
-        itemHeading: "task",
-      },
-      {
-        item: startedText,
-        remainingItem: [taskText, binText],
-        itemHeading: "stared ",
-      },
-      {
-        item: binText,
-        remainingItem: [startedText, taskText],
-        itemHeading: "bin",
-      },
-    ].forEach(({ item, remainingItem, itemHeading }) => {
-      item.addEventListener("click", () => {
-        const heading = document.createElement("h1");
-        heading.innerHTML = itemHeading;
-        const topNavigationbar = document.getElementById("topNavigation-bar");
-        topNavigationbar.innerHTML = "";
-        topNavigationbar.appendChild(heading);
-        topNavigationbar.classList.add("dynamicHeading");
-        taskText.style.color = "blue";
-        heading.style.color = "blue";
-        remainingItem.forEach((remaining) => {
-          remaining.style.color = "#5b5b5b";
+
+    taskText.addEventListener("click", () => {
+      const heading = document.createElement("h1");
+      heading.innerHTML = " tasks";
+      const topNavigationbar = document.getElementById("topNavigation-bar");
+      topNavigationbar.innerHTML = "";
+      topNavigationbar.appendChild(heading);
+      topNavigationbar.classList.add("dynamicHeading");
+      taskText.style.color = "blue";
+      heading.style.color = "blue";
+      startedText.style.color = "#5b5b5b";
+      binText.style.color = "#5b5b5b";
+      const currentTodoList = getTodoItems();
+      const listToRender = currentTodoList.filter((item) => !item.isDeleted);
+      renderList(listToRender);
+      //
+    });
+
+    startedText.addEventListener("click", () => {
+      const heading = document.createElement("h1");
+      heading.innerHTML = "Saved Tasks";
+      const topNavigationbar = document.getElementById("topNavigation-bar");
+      topNavigationbar.innerHTML = "";
+      topNavigationbar.appendChild(heading);
+      topNavigationbar.classList.add("dynamicHeading");
+      startedText.style.color = "blue";
+      heading.style.color = "blue";
+      taskText.style.color = "#5b5b5b";
+      binText.style.color = "#5b5b5b";
+      const currentTodoList = getTodoItems();
+      const listToRender = currentTodoList.filter((item) => item.isStarred);
+      renderList(listToRender);
+    });
+
+    binText.addEventListener("click", () => {
+      const heading = document.createElement("h1");
+      heading.innerHTML = "Bin";
+      const topNavigationbar = document.getElementById("topNavigation-bar");
+      topNavigationbar.innerHTML = "";
+      topNavigationbar.appendChild(heading);
+      topNavigationbar.classList.add("dynamicHeading");
+      binText.style.color = "blue";
+      heading.style.color = "blue";
+      taskText.style.color = "#5b5b5b";
+      startedText.style.color = "#5b5b5b";
+      const currentTodoList = getTodoItems();
+      const listToRender = currentTodoList.filter((item) => item.isDeleted);
+      renderList(listToRender);
+    });
+    // filter the currentTodoList
+
+    const renderList = (todos) => {
+      listContainer.innerHTML = "";
+      todos.forEach((item) => {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = !item.isPending;
+        checkbox.classList.add("todoListIcons");
+        checkbox.addEventListener("click", () => {
+          const currentTodoList = getTodoItems();
+          const updatedList = currentTodoList.map((ele) => {
+            if (ele.id == item.id) {
+              return {
+                ...ele,
+                isPending: !ele.isPending,
+              };
+            } else {
+              return { ...ele };
+            }
+          });
+          setTodoItems(updatedList);
+        });
+        const listItem = document.createElement("li");
+        listItem.innerHTML = item.todoTitle;
+        listItem.classList.add("listItem");
+
+        const startedBtn = document.createElement("img");
+
+        startedBtn.src = item.isStarred
+          ? "assets/str.png"
+          : "assets/Star 2.svg";
+        item.isStarred
+          ? startedBtn.classList.add("starrednewImg")
+          : startedBtn.classList.add("todoListIcons");
+        const deleteBtn = document.createElement("img");
+        deleteBtn.src = "assets/bin icon.svg";
+        deleteBtn.classList.add("todoListIcons");
+        deleteBtn.addEventListener("click", () => {
+          listContainer.removeChild(listItem);
+          const currentTodoList = getTodoItems();
+          const updatedList = currentTodoList.map((ele) => {
+            if (ele.id == item.id) {
+              return {
+                ...ele,
+                isDeleted: !ele.isDeleted,
+              };
+            } else {
+              return { ...ele };
+            }
+          });
+          setTodoItems(updatedList);
+        });
+        !item.isDeleted && listItem.appendChild(checkbox);
+
+        !item.isDeleted && listItem.appendChild(startedBtn);
+
+        !item.isDeleted && listItem.appendChild(deleteBtn);
+
+        listContainer.appendChild(listItem);
+        // starred
+        startedBtn.addEventListener("click", () => {
+          startedBtn.src = "assets/str.png";
+          startedBtn.classList.add("starrednewImg");
+
+          const currentTodoList = getTodoItems();
+          const updatedList = currentTodoList.map((ele) => {
+            if (ele.id == item.id) {
+              return {
+                ...ele,
+                isStarred: !ele.isStarred,
+              };
+            } else {
+              return { ...ele };
+            }
+          });
+          setTodoItems(updatedList);
         });
       });
-    });
-
-    // taskText.addEventListener("click", () => {
-    //   const heading = document.createElement("h1");
-    //   heading.innerHTML = " tasks";
-    //   const topNavigationbar = document.getElementById("topNavigation-bar");
-    //   topNavigationbar.innerHTML = "";
-    //   topNavigationbar.appendChild(heading);
-    //   topNavigationbar.classList.add("dynamicHeading");
-    //   taskText.style.color = "blue";
-    //   heading.style.color = "blue";
-    //   startedText.style.color = "#5b5b5b";
-    //   binText.style.color = "#5b5b5b";
-    // });
-
-    // startedText.addEventListener("click", () => {
-    //   const heading = document.createElement("h1");
-    //   heading.innerHTML = "Saved Tasks";
-    //   const topNavigationbar = document.getElementById("topNavigation-bar");
-    //   topNavigationbar.innerHTML = "";
-    //   topNavigationbar.appendChild(heading);
-    //   topNavigationbar.classList.add("dynamicHeading");
-    //   startedText.style.color = "blue";
-    //   heading.style.color = "blue";
-    //   taskText.style.color = "#5b5b5b";
-    //   binText.style.color = "#5b5b5b";
-    // });
-
-    // binText.addEventListener("click", () => {
-    //   const heading = document.createElement("h1");
-    //   heading.innerHTML = "Bin";
-    //   const topNavigationbar = document.getElementById("topNavigation-bar");
-    //   topNavigationbar.innerHTML = "";
-    //   topNavigationbar.appendChild(heading);
-    //   topNavigationbar.classList.add("dynamicHeading");
-    //   binText.style.color = "blue";
-    //   heading.style.color = "blue";
-    //   taskText.style.color = "#5b5b5b";
-    //   startedText.style.color = "#5b5b5b";
-    // });
+      // delete
+    };
   </script>
 </html>
